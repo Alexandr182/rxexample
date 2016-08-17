@@ -3,6 +3,7 @@ package sample.rxexample.model;
 import com.google.gson.annotations.SerializedName;
 
 import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
 /**
  * Created by profiralexandr on 17/08/16.
@@ -10,6 +11,7 @@ import io.realm.RealmObject;
 
 public class SearchResult extends RealmObject {
     @SerializedName("lf")
+    @PrimaryKey
     private String name;
     @SerializedName("freq")
     private int frequency;

@@ -6,9 +6,17 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.widget.Toast;
 
+import com.jakewharton.rxbinding.view.RxView;
+
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.Bind;
+import butterknife.ButterKnife;
+import rx.Observable;
+import rx.Subscriber;
+import rx.functions.Action1;
+import rx.functions.Func1;
 import sample.rxexample.R;
 import sample.rxexample.model.SearchResult;
 import sample.rxexample.presenter.SearchPresenter;
@@ -24,17 +32,31 @@ public class SearchActivity extends AppCompatActivity implements SearchView {
     RecyclerView mResultsRV;
 
     private SearchPresenter mPresenter;
+    private Subscriber<? super String> mSearchSubscriber;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
         initData();
         initViews();
     }
 
     private void initData() {
         mPresenter = new SearchPresenter(this);
+        initSearchSubscriber();
+    }
+
+    private void initSearchSubscriber() {
+        Observable.create(new Observable.OnSubscribe<String>() {
+            @Override
+            public void call(Subscriber<? super String> subscriber) {
+                mSearchSubscriber = subscriber;
+            }
+        }).debounce(300, TimeUnit.MILLISECONDS).subscribe(s -> {
+            mPresenter.searchForWithRx(s);
+        });
     }
 
     private void initViews() {
@@ -47,13 +69,13 @@ public class SearchActivity extends AppCompatActivity implements SearchView {
         mSearchSV.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                mPresenter.searchFor(query);
+                mSearchSubscriber.onNext(query);
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                mPresenter.searchFor(newText);
+                mSearchSubscriber.onNext(newText);
                 return true;
             }
         });
