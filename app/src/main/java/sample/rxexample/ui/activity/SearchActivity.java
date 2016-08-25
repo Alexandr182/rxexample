@@ -1,12 +1,10 @@
 package sample.rxexample.ui.activity;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.widget.Toast;
-
-import com.jakewharton.rxbinding.view.RxView;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -15,8 +13,6 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import rx.Observable;
 import rx.Subscriber;
-import rx.functions.Action1;
-import rx.functions.Func1;
 import sample.rxexample.R;
 import sample.rxexample.model.SearchResult;
 import sample.rxexample.presenter.SearchPresenter;
@@ -54,7 +50,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView {
             public void call(Subscriber<? super String> subscriber) {
                 mSearchSubscriber = subscriber;
             }
-        }).debounce(300, TimeUnit.MILLISECONDS).subscribe(s -> {
+        }).debounce(100, TimeUnit.MILLISECONDS).subscribe(s -> {
             mPresenter.searchForWithRx(s);
         });
     }

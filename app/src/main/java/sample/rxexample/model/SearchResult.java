@@ -17,6 +17,7 @@ public class SearchResult extends RealmObject {
     private int frequency;
     @SerializedName("since")
     private int sinceYear;
+    private String acronym;
 
     public String getName() {
         return name;
@@ -40,5 +41,13 @@ public class SearchResult extends RealmObject {
 
     public void setSinceYear(int sinceYear) {
         this.sinceYear = sinceYear;
+    }
+
+    public String getAcronym() {
+        return acronym;
+    }
+
+    public void setAcronym(String acronym) {
+        this.acronym = acronym;
     }
 }

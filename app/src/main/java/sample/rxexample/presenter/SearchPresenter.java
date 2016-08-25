@@ -1,9 +1,8 @@
 package sample.rxexample.presenter;
 
-import android.text.TextUtils;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -11,7 +10,6 @@ import retrofit2.Response;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import sample.rxexample.api.ApiHelper;
@@ -56,19 +54,34 @@ public class SearchPresenter {
     }
 
     public void searchForWithRx(String text) {
-        findAcronymsFromApi(text).observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<List<SearchResult>>() {
+        Observable.concat(findAcronymsFromRealm(text), findAcronymsFromApi(text))
+                .observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<List<SearchResult>>() {
             @Override
             public void onCompleted() {
             }
 
             @Override
             public void onError(Throwable e) {
+                e.printStackTrace();
             }
 
             @Override
             public void onNext(List<SearchResult> results) {
                 mSearchView.onResultsLoaded(results);
             }
+        });
+    }
+
+    private Observable<List<SearchResult>> findAcronymsFromRealm(String name) {
+        return Observable.create(subscriber -> {
+            try {
+                RealmHelper realmHelper = RealmHelper.getInstance();
+                subscriber.onNext(realmHelper.getAcronyms(name));
+            } catch (Exception e) {
+                subscriber.onError(e);
+                return;
+            }
+            subscriber.onCompleted();
         });
     }
 
@@ -82,7 +95,10 @@ public class SearchPresenter {
                     return new ArrayList<>();
                 }
             }
-        }).doOnNext(results -> {
+        }).delay(1000, TimeUnit.MILLISECONDS).doOnNext(results -> {
+            for (SearchResult searchResult : results) {
+                searchResult.setAcronym(name);
+            }
             RealmHelper realmHelper = new RealmHelper();
             realmHelper.saveToRealm(results);
         }).subscribeOn(Schedulers.io());

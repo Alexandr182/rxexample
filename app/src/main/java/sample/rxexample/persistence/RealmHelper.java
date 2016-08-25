@@ -39,6 +39,6 @@ public class RealmHelper {
     }
 
     public List<SearchResult> getAcronyms(String name) {
-        return mRealm.copyFromRealm(mRealm.where(SearchResult.class).equalTo("name", name).findAll());
+        return mRealm.copyFromRealm(mRealm.where(SearchResult.class).findAll());
     }
 }
