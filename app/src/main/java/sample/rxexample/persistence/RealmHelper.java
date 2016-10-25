@@ -22,11 +22,12 @@ public class RealmHelper {
         mRealm.commitTransaction();
     }
 
-    public List<SearchResult> getAcronyms(String name) {
-        return mRealm.copyFromRealm(mRealm.where(SearchResult.class).findAll());
-    }
-
     public void close() {
         mRealm.close();
+    }
+
+    public List<SearchResult> getAcronyms(String name) {
+        //#0
+        return mRealm.copyFromRealm(mRealm.where(SearchResult.class).findAll());
     }
 }
