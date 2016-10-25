@@ -51,7 +51,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView {
                 mSearchSubscriber = subscriber;
             }
         }).debounce(100, TimeUnit.MILLISECONDS).subscribe(s -> {
-            mPresenter.searchForWithRx(s);
+            mPresenter.searchForAcronym(s);
         });
     }
 

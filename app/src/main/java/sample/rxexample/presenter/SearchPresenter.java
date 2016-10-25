@@ -2,11 +2,7 @@ package sample.rxexample.presenter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -17,6 +13,7 @@ import sample.rxexample.model.SearchResult;
 import sample.rxexample.model.response.FindAcronymResponse;
 import sample.rxexample.persistence.RealmHelper;
 import sample.rxexample.ui.view.SearchView;
+import sample.rxexample.utils.RealmUtils;
 
 /**
  * Created by profiralexandr on 17/08/16.
@@ -33,27 +30,7 @@ public class SearchPresenter {
         mSearchView = null;
     }
 
-    public void searchFor(String newText) {
-        Call<List<FindAcronymResponse>> call = ApiHelper.getApi().findAcronyms(newText);
-        call.enqueue(new Callback<List<FindAcronymResponse>>() {
-            @Override
-            public void onResponse(Call<List<FindAcronymResponse>> call, Response<List<FindAcronymResponse>> baseResponse) {
-                List<FindAcronymResponse> response = baseResponse.body();
-                if (!response.isEmpty()) {
-                    mSearchView.onResultsLoaded(response.get(0).getSearchResults());
-                } else {
-                    mSearchView.onResultsLoaded(new ArrayList<>());
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<FindAcronymResponse>> call, Throwable t) {
-                mSearchView.onLoadingFailed();
-            }
-        });
-    }
-
-    public void searchForWithRx(String text) {
+    public void searchForAcronym(String text) {
         Observable.concat(findAcronymsFromRealm(text), findAcronymsFromApi(text))
                 .observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<List<SearchResult>>() {
             @Override
@@ -75,8 +52,9 @@ public class SearchPresenter {
     private Observable<List<SearchResult>> findAcronymsFromRealm(String name) {
         return Observable.create(subscriber -> {
             try {
-                RealmHelper realmHelper = RealmHelper.getInstance();
+                RealmHelper realmHelper = new RealmHelper(RealmUtils.getRealm());
                 subscriber.onNext(realmHelper.getAcronyms(name));
+                realmHelper.close();
             } catch (Exception e) {
                 subscriber.onError(e);
                 return;
@@ -95,12 +73,13 @@ public class SearchPresenter {
                     return new ArrayList<>();
                 }
             }
-        }).delay(1000, TimeUnit.MILLISECONDS).doOnNext(results -> {
+        }).doOnNext(results -> {
             for (SearchResult searchResult : results) {
                 searchResult.setAcronym(name);
             }
-            RealmHelper realmHelper = new RealmHelper();
+            RealmHelper realmHelper = new RealmHelper(RealmUtils.getRealm());
             realmHelper.saveToRealm(results);
+            realmHelper.close();
         }).subscribeOn(Schedulers.io());
     }
 }
