@@ -74,9 +74,6 @@ public class SearchPresenter {
                 }
             }
         }).doOnNext(results -> {
-            for (SearchResult searchResult : results) {
-                searchResult.setAcronym(name);
-            }
             RealmHelper realmHelper = new RealmHelper(RealmUtils.getRealm());
             realmHelper.saveToRealm(results);
             realmHelper.close();

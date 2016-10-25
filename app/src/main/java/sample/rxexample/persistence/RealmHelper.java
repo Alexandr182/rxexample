@@ -2,6 +2,7 @@ package sample.rxexample.persistence;
 
 import java.util.List;
 
+import io.realm.Case;
 import io.realm.Realm;
 import sample.rxexample.model.SearchResult;
 
@@ -26,8 +27,8 @@ public class RealmHelper {
         mRealm.close();
     }
 
-    public List<SearchResult> getAcronyms(String name) {
-        //#0
-        return mRealm.copyFromRealm(mRealm.where(SearchResult.class).findAll());
+    public List<SearchResult> getAcronyms(String acronym) {
+        List<SearchResult> results = mRealm.copyFromRealm(mRealm.where(SearchResult.class).findAll());
+        return results;
     }
 }
