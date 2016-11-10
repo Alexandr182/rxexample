@@ -11,6 +11,7 @@ import rx.schedulers.Schedulers;
 import sample.rxexample.api.ApiHelper;
 import sample.rxexample.model.SearchResult;
 import sample.rxexample.model.response.FindAcronymResponse;
+import sample.rxexample.persistence.AcronymsDao;
 import sample.rxexample.persistence.RealmHelper;
 import sample.rxexample.ui.view.SearchView;
 import sample.rxexample.utils.RealmUtils;
@@ -52,9 +53,8 @@ public class SearchPresenter {
     private Observable<List<SearchResult>> findAcronymsFromRealm(String name) {
         return Observable.create(subscriber -> {
             try {
-                RealmHelper realmHelper = new RealmHelper(RealmUtils.getRealm());
-                subscriber.onNext(realmHelper.getAcronyms(name));
-                realmHelper.close();
+                AcronymsDao dao = new AcronymsDao();
+                subscriber.onNext(dao.getAcronyms(name));
             } catch (Exception e) {
                 subscriber.onError(e);
                 return;
@@ -74,9 +74,8 @@ public class SearchPresenter {
                 }
             }
         }).doOnNext(results -> {
-            RealmHelper realmHelper = new RealmHelper(RealmUtils.getRealm());
-            realmHelper.saveToRealm(results);
-            realmHelper.close();
+            AcronymsDao dao = new AcronymsDao();
+            dao.saveResults(results);
         }).subscribeOn(Schedulers.io());
     }
 }
