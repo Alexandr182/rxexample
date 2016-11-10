@@ -38,7 +38,7 @@ public class AcronymsDaoTest {
         searchResults.add(generateSearchResult("ae st dy", 2, 2001));
         searchResults.add(generateSearchResult("bn tl dd", 3, 1990));
         searchResults.add(generateSearchResult("bi tl dk", 3, 1992));
-        searchResults.add(generateSearchResult("bo ta di", 4, 1995));
+        searchResults.add(generateSearchResult("bo ta di", 2, 1995));
         searchResults.add(generateSearchResult("be tc ok", 2, 1886));
         return searchResults;
     }
@@ -59,7 +59,7 @@ public class AcronymsDaoTest {
 
     @Test
     public void testAcronymResult_bte() {
-        List<SearchResult> results = getAcronymsDao().getAcronyms("bte");
+        List<SearchResult> results = getAcronymsDao().getAcronyms("btd");
         assertThat(results.size(), is(3));
     }
 
@@ -77,7 +77,7 @@ public class AcronymsDaoTest {
 
     @Test
     public void testAcronymResult_bto_frequency_and_year_order() {
-        List<SearchResult> results = getAcronymsDao().getAcronyms("bto");
+        List<SearchResult> results = getAcronymsDao().getAcronyms("btd");
         assertThat(results.get(0).getFrequency() == results.get(1).getFrequency() &&
                 results.get(0).getYear() >= results.get(1).getYear(), is(true));
     }

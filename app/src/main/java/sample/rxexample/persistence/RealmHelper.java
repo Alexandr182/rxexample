@@ -29,4 +29,8 @@ public class RealmHelper {
     public List<SearchResult> getSearchResults() {
         return mRealm.copyFromRealm(mRealm.where(SearchResult.class).findAll());
     }
+
+    public List<SearchResult> getSearchResultsStartingWith(String s) {
+        return mRealm.copyFromRealm(mRealm.where(SearchResult.class).findAll());
+    }
 }
